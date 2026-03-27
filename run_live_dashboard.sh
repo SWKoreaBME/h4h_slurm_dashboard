@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+HOST="${HOST:-127.0.0.1}"
+PORT="${PORT:-8000}"
+REFRESH="${REFRESH:-15}"
+POLL_INTERVAL="${POLL_INTERVAL:-15}"
+TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-8}"
+
+export DASHBOARD_DATA_SOURCE=live
+export DASHBOARD_REFRESH_SECONDS="${REFRESH}"
+export DASHBOARD_POLL_INTERVAL_SECONDS="${POLL_INTERVAL}"
+export DASHBOARD_COMMAND_TIMEOUT_SECONDS="${TIMEOUT_SECONDS}"
+
+# Preferred mode on a compute node where local nvidia-smi is available.
+export DASHBOARD_ENABLE_GPU_TELEMETRY="${DASHBOARD_ENABLE_GPU_TELEMETRY:-true}"
+export DASHBOARD_GPU_QUERY_MODE="${DASHBOARD_GPU_QUERY_MODE:-local}"
+export DASHBOARD_GPU_PROBE_SCOPE="${DASHBOARD_GPU_PROBE_SCOPE:-active}"
+export DASHBOARD_GPU_PROBE_LIMIT="${DASHBOARD_GPU_PROBE_LIMIT:-4}"
+
+exec uv run uvicorn app.main:app --host "${HOST}" --port "${PORT}"

@@ -1,0 +1,248 @@
+:root {
+  --bg: #f3f0e7;
+  --panel: #fffdf8;
+  --ink: #1b2430;
+  --muted: #5a6570;
+  --border: #d8d1c3;
+  --idle: #4f7a4f;
+  --allocated: #2a6f97;
+  --mixed: #b26f16;
+  --down: #b23a48;
+  --drained: #8a4fff;
+  --healthy: #4f7a4f;
+  --partial: #b26f16;
+  --stale: #b23a48;
+  --ok: #2a6f97;
+  --unavailable: #7a7a7a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(42, 111, 151, 0.18), transparent 24rem),
+    linear-gradient(180deg, #f6f2e8 0%, #efe8d8 100%);
+}
+
+.page {
+  width: min(1680px, calc(100vw - 1rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 2rem;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+h1, h2 {
+  margin: 0;
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+.subtitle,
+.meta-line {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.refresh-button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #fffdf8 0%, #efe6d2 100%);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.refresh-button:hover {
+  background: linear-gradient(180deg, #fffaf1 0%, #e9dcc2 100%);
+}
+
+.banner,
+.card,
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(27, 36, 48, 0.06);
+}
+
+.banner {
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.card {
+  padding: 1rem;
+}
+
+.card span {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.card strong {
+  display: block;
+  font-size: 1.7rem;
+  margin-top: 0.25rem;
+}
+
+.panel {
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 1rem 1rem 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+table[data-filter-table="nodes"] {
+  min-width: 1600px;
+}
+
+table[data-filter-table="jobs"] {
+  min-width: 1100px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.7rem 0.6rem;
+  border-bottom: 1px solid rgba(216, 209, 195, 0.8);
+  vertical-align: top;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.filter-row th {
+  padding-top: 0.35rem;
+  padding-bottom: 0.75rem;
+}
+
+.filter-row input {
+  width: 100%;
+  min-width: 4.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem 0.45rem;
+  font: inherit;
+  background: #fffdfa;
+  color: var(--ink);
+}
+
+.filter-row input::placeholder {
+  color: #8a8f96;
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  color: white;
+  font-size: 0.8rem;
+  text-transform: lowercase;
+}
+
+.badge-idle,
+.badge-healthy {
+  background: var(--healthy);
+}
+
+.badge-allocated,
+.badge-ok {
+  background: var(--allocated);
+}
+
+.badge-mixed,
+.badge-partial {
+  background: var(--partial);
+}
+
+.badge-down,
+.badge-stale {
+  background: var(--down);
+}
+
+.badge-drained {
+  background: var(--drained);
+}
+
+.badge-unavailable,
+.badge-unknown {
+  background: var(--unavailable);
+}
+
+.badge-slurm-only {
+  background: #6c757d;
+}
+
+.state-row.state-down,
+.state-row.state-drained {
+  background: rgba(178, 58, 72, 0.06);
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.footer-note {
+  margin-top: 1.25rem;
+  padding: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .page {
+    width: calc(100vw - 1rem);
+  }
+
+  .topbar {
+    flex-direction: column;
+  }
+
+  .meta {
+    align-items: flex-start;
+  }
+}

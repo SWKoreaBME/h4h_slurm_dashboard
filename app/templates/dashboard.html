@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}SLURM GPU Dashboard{% endblock %}
+{% block body %}
+<main class="page" data-refresh-seconds="{{ refresh_seconds }}">
+  <header class="topbar">
+    <div>
+      <h1>SLURM GPU Dashboard</h1>
+      <p class="subtitle">Read-only cluster overview for internal monitoring</p>
+    </div>
+    <div class="meta">
+      <span class="badge badge-{{ snapshot.collection_status }}">{{ snapshot.collection_status }}</span>
+      <span class="meta-line">Updated {{ snapshot.snapshot_time }}</span>
+      <span class="meta-line">Source {{ data_source }}</span>
+      <button type="button" class="refresh-button" id="refresh-now">Refresh now</button>
+    </div>
+  </header>
+
+  {% if snapshot.errors %}
+  <section class="banner">
+    <strong>Partial data:</strong>
+    {{ snapshot.errors | join(" | ") }}
+  </section>
+  {% endif %}
+
+  <section class="summary-grid">
+    <article class="card"><span>Total Nodes</span><strong>{{ snapshot.summary.total_nodes }}</strong></article>
+    <article class="card"><span>Idle</span><strong>{{ snapshot.summary.nodes_by_state.idle }}</strong></article>
+    <article class="card"><span>Allocated</span><strong>{{ snapshot.summary.nodes_by_state.allocated }}</strong></article>
+    <article class="card"><span>Mixed</span><strong>{{ snapshot.summary.nodes_by_state.mixed }}</strong></article>
+    <article class="card"><span>Down</span><strong>{{ snapshot.summary.nodes_by_state.down }}</strong></article>
+    <article class="card"><span>Drained</span><strong>{{ snapshot.summary.nodes_by_state.drained }}</strong></article>
+    <article class="card"><span>Total GPUs</span><strong>{{ snapshot.summary.total_gpus }}</strong></article>
+    <article class="card"><span>Active GPUs</span><strong>{{ snapshot.summary.active_gpus }}</strong></article>
+    <article class="card"><span>Running Jobs</span><strong>{{ snapshot.summary.running_jobs }}</strong></article>
+    <article class="card"><span>Pending Jobs</span><strong>{{ snapshot.summary.pending_jobs }}</strong></article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Nodes</h2>
+    </div>
+    <div class="table-wrap">
+      <table data-filter-table="nodes">
+        <thead>
+          <tr>
+            <th>Node</th>
+            <th>Partition</th>
+            <th>State</th>
+            <th>CPU</th>
+            <th>Memory Alloc (GB)</th>
+            <th>Memory Free (GB)</th>
+            <th>Memory Total (GB)</th>
+            <th>GPU Type</th>
+            <th>GPU</th>
+            <th>Users</th>
+            <th>Jobs</th>
+            <th>Telemetry</th>
+            <th>Reason</th>
+          </tr>
+          <tr class="filter-row">
+            <th><input type="text" data-filter-input="nodes" data-filter-column="0" placeholder="Filter node"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="1" placeholder="Filter partition"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="2" placeholder="Filter state"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="3" placeholder="Filter CPU"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="4" placeholder="Filter alloc"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="5" placeholder="Filter free"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="6" placeholder="Filter total"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="7" placeholder="Filter GPU type"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="8" placeholder="Filter GPU"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="9" placeholder="Filter users"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="10" placeholder="Filter jobs"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="11" placeholder="Filter telemetry"></th>
+            <th><input type="text" data-filter-input="nodes" data-filter-column="12" placeholder="Filter reason"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for node in snapshot.nodes %}
+          <tr class="state-row state-{{ node.state }}">
+            <td>{{ node.node_name }}</td>
+            <td>{{ node.partition }}</td>
+            <td><span class="badge badge-{{ node.state }}">{{ node.state }}</span></td>
+            <td>{{ node.cpu_allocated }}/{{ node.cpu_total }}</td>
+            <td>{{ node.memory_allocated_mb | gb }}</td>
+            <td>{{ node.free_memory_mb | gb }}</td>
+            <td>{{ node.memory_total_mb | gb }}</td>
+            <td>{{ node.gpu_type or "-" }}</td>
+            <td>{{ node.gpu_used_count }}/{{ node.gpu_count }}</td>
+            <td>{{ node.users_on_node | join(", ") if node.users_on_node else "-" }}</td>
+            <td>{{ node.jobs_on_node | join(", ") if node.jobs_on_node else "-" }}</td>
+            <td><span class="badge badge-{{ node.last_gpu_probe_status }}">{{ node.last_gpu_probe_status }}</span></td>
+            <td>{{ node.reason or "-" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Jobs</h2>
+    </div>
+    <div class="table-wrap">
+      <table data-filter-table="jobs">
+        <thead>
+          <tr>
+            <th>Job ID</th>
+            <th>User</th>
+            <th>Partition</th>
+            <th>State</th>
+            <th>Runtime</th>
+            <th>Nodes</th>
+            <th>GRES</th>
+            <th>Name</th>
+          </tr>
+          <tr class="filter-row">
+            <th><input type="text" data-filter-input="jobs" data-filter-column="0" placeholder="Filter job id"></th>
+            <th><input type="text" data-filter-input="jobs" data-filter-column="1" placeholder="Filter user"></th>
+            <th><input type="text" data-filter-input="jobs" data-filter-column="2" placeholder="Filter partition"></th>
+            <th><input type="text" data-filter-input="jobs" data-filter-column="3" placeholder="Filter state"></th>
+            <th><input type="text" data-filter-input="jobs" data-filter-column="4" placeholder="Filter runtime"></th>
+            <th><input type="text" data-filter-input="jobs" data-filter-column="5" placeholder="Filter nodes"></th>
+            <th><input type="text" data-filter-input="jobs" data-filter-column="6" placeholder="Filter GRES"></th>
+            <th><input type="text" data-filter-input="jobs" data-filter-column="7" placeholder="Filter name"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for job in snapshot.jobs %}
+          <tr>
+            <td>{{ job.job_id }}</td>
+            <td>{{ job.user }}</td>
+            <td>{{ job.partition }}</td>
+            <td>{{ job.state }}</td>
+            <td>{{ job.runtime }}</td>
+            <td>{{ job.nodelist }}</td>
+            <td>{{ job.requested_gres }}</td>
+            <td>{{ job.job_name }}</td>
+          </tr>
+          {% endfor %}
+          {% if not snapshot.jobs %}
+          <tr>
+            <td colspan="8" class="empty">No jobs available in current snapshot.</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="footer-note">
+    Maintained internally
+  </footer>
+</main>
+{% endblock %}

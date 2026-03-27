@@ -1,0 +1,14 @@
+dashboard:
+  data_source: mock
+  mock_snapshot_path: mock/snapshot_healthy.json
+  bind_host: 127.0.0.1
+  port: 8000
+  refresh_seconds: 15
+  poll_interval_seconds: 15
+  command_timeout_seconds: 8
+  enable_gpu_telemetry: true
+  gpu_query_mode: local
+  gpu_node_ssh_user: ""
+  gpu_node_ssh_bin: ssh
+  gpu_probe_scope: active
+  gpu_probe_limit: 8
